@@ -1,0 +1,215 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2DE9790E16A85D6800BE35BD /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DE9790D16A85D6800BE35BD /* main.c */; };
+		2DE9791016A85D6800BE35BD /* WraitheCMS.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2DE9790F16A85D6800BE35BD /* WraitheCMS.1 */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		2DE9790716A85D6800BE35BD /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				2DE9791016A85D6800BE35BD /* WraitheCMS.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		2DE9790916A85D6800BE35BD /* WraitheCMS */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = WraitheCMS; sourceTree = BUILT_PRODUCTS_DIR; };
+		2DE9790D16A85D6800BE35BD /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		2DE9790F16A85D6800BE35BD /* WraitheCMS.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = WraitheCMS.1; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		2DE9790616A85D6800BE35BD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2DE978FE16A85D6800BE35BD = {
+			isa = PBXGroup;
+			children = (
+				2DE9790C16A85D6800BE35BD /* WraitheCMS */,
+				2DE9790A16A85D6800BE35BD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		2DE9790A16A85D6800BE35BD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2DE9790916A85D6800BE35BD /* WraitheCMS */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2DE9790C16A85D6800BE35BD /* WraitheCMS */ = {
+			isa = PBXGroup;
+			children = (
+				2DE9790D16A85D6800BE35BD /* main.c */,
+				2DE9790F16A85D6800BE35BD /* WraitheCMS.1 */,
+			);
+			path = WraitheCMS;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		2DE9790816A85D6800BE35BD /* WraitheCMS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2DE9791316A85D6800BE35BD /* Build configuration list for PBXNativeTarget "WraitheCMS" */;
+			buildPhases = (
+				2DE9790516A85D6800BE35BD /* Sources */,
+				2DE9790616A85D6800BE35BD /* Frameworks */,
+				2DE9790716A85D6800BE35BD /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WraitheCMS;
+			productName = WraitheCMS;
+			productReference = 2DE9790916A85D6800BE35BD /* WraitheCMS */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2DE9790016A85D6800BE35BD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0450;
+				ORGANIZATIONNAME = "Michael D Henderson";
+			};
+			buildConfigurationList = 2DE9790316A85D6800BE35BD /* Build configuration list for PBXProject "WraitheCMS" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 2DE978FE16A85D6800BE35BD;
+			productRefGroup = 2DE9790A16A85D6800BE35BD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				2DE9790816A85D6800BE35BD /* WraitheCMS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2DE9790516A85D6800BE35BD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2DE9790E16A85D6800BE35BD /* main.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		2DE9791116A85D6800BE35BD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		2DE9791216A85D6800BE35BD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		2DE9791416A85D6800BE35BD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		2DE9791516A85D6800BE35BD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2DE9790316A85D6800BE35BD /* Build configuration list for PBXProject "WraitheCMS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2DE9791116A85D6800BE35BD /* Debug */,
+				2DE9791216A85D6800BE35BD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2DE9791316A85D6800BE35BD /* Build configuration list for PBXNativeTarget "WraitheCMS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2DE9791416A85D6800BE35BD /* Debug */,
+				2DE9791516A85D6800BE35BD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 2DE9790016A85D6800BE35BD /* Project object */;
+}

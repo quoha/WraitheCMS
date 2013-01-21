@@ -39,19 +39,13 @@ typedef struct WraitheCMS_VM        WraitheCMS_VM;
 
 //----------------------------------------------------------------------
 //
-struct WraitheCMS_Text {
-    int  isNull;
-    int  length;
-    char text[1];
-};
-
-
-//----------------------------------------------------------------------
-//
-struct WraitheCMS_StackNode {
-    WraitheCMS_StackNode *prev;
-    WraitheCMS_StackNode *next;
-    WraitheCMS_Text      *text;
+struct WraitheCMS_AST {
+    char            *sourceName;
+    int              sourceLine;
+    int            (*code)(WraitheCMS_VM *vm, WraitheCMS_Stack *stack);
+    WraitheCMS_AST  *bz;
+    WraitheCMS_AST  *bnz;
+    void            *data;
 };
 
 
@@ -66,6 +60,24 @@ struct WraitheCMS_Stack {
 
 //----------------------------------------------------------------------
 //
+struct WraitheCMS_StackNode {
+    WraitheCMS_StackNode *prev;
+    WraitheCMS_StackNode *next;
+    WraitheCMS_Text      *text;
+};
+
+
+//----------------------------------------------------------------------
+//
+struct WraitheCMS_Text {
+    int  isNull;
+    int  length;
+    char text[1];
+};
+
+
+//----------------------------------------------------------------------
+//
 struct WraitheCMS_VM {
     WraitheCMS_AST *currInstruction;
     WraitheCMS_AST *nextInstruction;
@@ -74,18 +86,6 @@ struct WraitheCMS_VM {
     char          **errmgs;
 
     int (*exec)(WraitheCMS_VM *vm, WraitheCMS_AST *ast, WraitheCMS_Stack *stack);
-};
-
-
-//----------------------------------------------------------------------
-//
-struct WraitheCMS_AST {
-    char            *sourceName;
-    int              sourceLine;
-    int            (*code)(WraitheCMS_VM *vm, WraitheCMS_Stack *stack);
-    WraitheCMS_AST  *bz;
-    WraitheCMS_AST  *bnz;
-    void            *data;
 };
 
 
@@ -114,7 +114,17 @@ WraitheCMS_VM        *WraitheCMS_NewVM(void);
 WraitheCMS_Text      *WraitheCMS_Stack_PopTop(WraitheCMS_Stack *stack);
 WraitheCMS_StackNode *WraitheCMS_Stack_PushTop(WraitheCMS_Stack *stack, WraitheCMS_Text *t);
 
+
+//----------------------------------------------------------------------
+// executable words that are used by the AST
+//
 int F_If(WraitheCMS_VM *vm, WraitheCMS_Stack *stack);
 int F_NoOp(WraitheCMS_VM *vm, WraitheCMS_Stack *stack);
+
+
+//----------------------------------------------------------------------
+//
+char *ReadFile(const char *fileName, int forceNewLine, int trimTrailingNewline);
+
 
 #endif

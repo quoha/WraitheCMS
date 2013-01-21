@@ -26,6 +26,7 @@
 //
 
 #include "WraitheCMS.h"
+#include "WraitheLexer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,6 +39,28 @@ int main(int argc, const char * argv[])
     printf("WraitheCMS greets YOU!\n\n");
     printf("WraitheCMS is licensed under the MIT license.\n");
     printf("Please see the file LICENSE for details.\n\n");
+
+    const char *viewFile = "/Users/mdhender/Software/WraitheCMS/data/article.tpl";
+    char *viewData = ReadFile(viewFile, 0, 0);
+    if (!viewData) {
+        perror(viewFile);
+        return 2;
+    }
+    printf("%s\n", viewData);
+    Lexer  *viewLexer = NewLexer(viewFile, viewData);
+    if (!viewLexer) {
+        perror("viewLexer");
+        return 2;
+    }
+    Lexeme *view = ViewLexer(viewLexer);
+    if (!view) {
+        perror("ViewLexer");
+        return 2;
+    }
+    while (view) {
+        printf(" view:\t%2d %2d %s\n", view->line, view->kind, view->data);
+        view = view->next;
+    }
 
     WraitheCMS_Stack *stack = WraitheCMS_NewStack();
     WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText("true", -1));

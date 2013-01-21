@@ -1,8 +1,8 @@
 //
-//  main.c
+//  text.c
 //  WraitheCMS
 //
-//  Created by Michael Henderson on 1/17/13.
+//  Created by Michael Henderson on 1/21/13.
 //
 // Copyright (c) 2013 Michael D Henderson
 //
@@ -30,46 +30,24 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 //----------------------------------------------------------------------
 //
-int main(int argc, const char * argv[])
-{
-    printf("WraitheCMS greets YOU!\n\n");
-    printf("WraitheCMS is licensed under the MIT license.\n");
-    printf("Please see the file LICENSE for details.\n\n");
-
-    WraitheCMS_Stack *stack = WraitheCMS_NewStack();
-    WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText("true", -1));
-    WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText(0, 0));
-    
-    WraitheCMS_AST *a1 = WraitheCMS_NewAST(F_NoOp);
-    WraitheCMS_AST *a2 = WraitheCMS_NewAST(F_If);
-    WraitheCMS_AST *a3 = WraitheCMS_NewAST(F_NoOp);
-    WraitheCMS_AST *a4 = WraitheCMS_NewAST(F_NoOp);
-    WraitheCMS_AST *a5 = WraitheCMS_NewAST(F_NoOp);
-    if (!a1 || !a2 || !a3 || !a4 || !a5) {
-        perror("new AST");
-        return 2;
-    }
-
-    a1->bz  = a2;
-    a2->bz  = a3;
-    a2->bnz = a4;
-    a3->bz  = a5;
-    a4->bz  = a5;
-
-    WraitheCMS_VM *vm = WraitheCMS_NewVM();
-    if (!vm) {
-        perror("new VM");
-        return 0;
-    }
-
-    if (vm->exec(vm, a1, stack) != VM_OK) {
-        printf("\nerror:\tvirtual machine failed\n\n");
-        return 2;
+WraitheCMS_Text *WraitheCMS_NewText(const char *data_, int length) {
+    if (length < 0) {
+        length = (int)strlen(data_ ? data_ : "");
     }
     
-    return 0;
+    WraitheCMS_Text *t = malloc(sizeof(*t) + length);
+    if (t) {
+        t->length = length;
+        t->isNull = data_ ? 0 : 1;
+        if (t->isNull || t->length == 0) {
+            t->text[0] = 0;
+        } else {
+            memcpy(t->text, data_, t->length);
+            t->text[length] = 0;
+        }
+    }
+    
+    return t;
 }
-

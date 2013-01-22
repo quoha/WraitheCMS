@@ -51,35 +51,23 @@ int main(int argc, const char * argv[])
     }
     printf(">>>%s<<<\n\n", source.data->text);
 
-    void *parse = ViewParse(&source);
+    WraitheCMS_AST *astView = ViewParse(&source);
+    if (!astView) {
+        printf("error:\tunable to successfully parse the view file '%s'\n", source.source);
+        return 2;
+    }
 
     WraitheCMS_Stack *stack = WraitheCMS_NewStack();
     WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText("true", -1));
     WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText(0, 0));
     
-    WraitheCMS_AST *a1 = WraitheCMS_NewAST(F_NoOp);
-    WraitheCMS_AST *a2 = WraitheCMS_NewAST(F_If);
-    WraitheCMS_AST *a3 = WraitheCMS_NewAST(F_NoOp);
-    WraitheCMS_AST *a4 = WraitheCMS_NewAST(F_NoOp);
-    WraitheCMS_AST *a5 = WraitheCMS_NewAST(F_NoOp);
-    if (!a1 || !a2 || !a3 || !a4 || !a5) {
-        perror("new AST");
-        return 2;
-    }
-
-    a1->bz  = a2;
-    a2->bz  = a3;
-    a2->bnz = a4;
-    a3->bz  = a5;
-    a4->bz  = a5;
-
     WraitheCMS_VM *vm = WraitheCMS_NewVM();
     if (!vm) {
         perror("new VM");
         return 0;
     }
 
-    if (vm->exec(vm, a1, stack) != VM_OK) {
+    if (vm->exec(vm, astView, stack) != VM_OK) {
         printf("\nerror:\tvirtual machine failed\n\n");
         return 2;
     }

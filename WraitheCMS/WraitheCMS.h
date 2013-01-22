@@ -137,6 +137,6 @@ int F_NoOp(WraitheCMS_VM *vm, WraitheCMS_Stack *stack);
 //
 WraitheCMS_Text *ReadFile(const char *fileName, int forceNewLine, int trimTrailingNewline);
 
-void *ViewParse(WraitheCMS_Source *source);
+WraitheCMS_AST *ViewParse(WraitheCMS_Source *source);
 
 #endif

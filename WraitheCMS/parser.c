@@ -26,7 +26,6 @@
 //
 
 #include "WraitheCMS.h"
-#include "WraitheLexer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -73,9 +72,9 @@ struct Lexeme {
 //
 typedef struct PState PState;
 struct PState {
-    Lexeme *lex;
-    void   *root;
-    void   *tail;
+    Lexeme         *lex;
+    WraitheCMS_AST *root;
+    WraitheCMS_AST *tail;
 };
 
 
@@ -120,13 +119,14 @@ static int     ParseWord(PState *ps);
 //
 //            END_OF_INPUT -> Accept(END_OF_INPUT);
 //
-
-void *ViewParse(WraitheCMS_Source *source) {
+// all ASTs start and end with no-ops
+//
+WraitheCMS_AST *ViewParse(WraitheCMS_Source *source) {
     printf("parse:\tentered\n");
 
     PState ps;
-    ps.root = 0;
-    ps.tail = 0;
+    ps.root = WraitheCMS_NewAST(F_NoOp);
+    ps.tail = ps.root;
 
     source->line = 1;
     source->curr = source->data->text;
@@ -154,7 +154,9 @@ void *ViewParse(WraitheCMS_Source *source) {
         printf("parse:\tfailed - did not find EOF as expected\n");
         return 0;
     }
-    
+
+    ps.tail->bz = WraitheCMS_NewAST(F_NoOp);
+
     printf("parse:\texiting\n");
     
     return ps.root;
@@ -176,6 +178,7 @@ int Accept(PState *ps, int kind) {
 //
 int AcceptElse(PState *ps) {
     if (Match(ps, lxELSE)) {
+        WraitheCMS_AST *ast = WraitheCMS_NewAST(F_NoOp);
         ps->lex = ps->lex->next;
         return 1;
     }
@@ -187,6 +190,7 @@ int AcceptElse(PState *ps) {
 //
 int AcceptEndIf(PState *ps) {
     if (Match(ps, lxENDIF)) {
+        WraitheCMS_AST *ast = WraitheCMS_NewAST(F_NoOp);
         ps->lex = ps->lex->next;
         return 1;
     }
@@ -198,6 +202,7 @@ int AcceptEndIf(PState *ps) {
 //
 int AcceptIf(PState *ps) {
     if (Match(ps, lxIF)) {
+        WraitheCMS_AST *ast = WraitheCMS_NewAST(F_If);
         ps->lex = ps->lex->next;
         return 1;
     }
@@ -209,6 +214,7 @@ int AcceptIf(PState *ps) {
 //
 int AcceptText(PState *ps) {
     if (Match(ps, lxTEXT)) {
+        WraitheCMS_AST *ast = WraitheCMS_NewAST(F_NoOp);
         ps->lex = ps->lex->next;
         return 1;
     }
@@ -220,6 +226,16 @@ int AcceptText(PState *ps) {
 //
 int AcceptWord(PState *ps) {
     if (Match(ps, lxWORD)) {
+        // if the word is special, assign a special function to it.
+        // otherwise, look it up in the symbol table and add it to
+        // the tree
+        //
+        int (*code)(WraitheCMS_VM *vm, WraitheCMS_Stack *stack) = F_NoOp;
+
+        // append the node to the current tree
+        //
+        WraitheCMS_AST *ast = WraitheCMS_NewAST(code);
+
         ps->lex = ps->lex->next;
         return 1;
     }

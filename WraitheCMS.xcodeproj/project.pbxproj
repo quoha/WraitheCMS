@@ -8,11 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		2D065DDD16ADCB5100B898CA /* text.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D065DDC16ADCB5100B898CA /* text.c */; };
-		2D065DDF16ADCB8E00B898CA /* ast.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D065DDE16ADCB8E00B898CA /* ast.c */; };
 		2D065DE116ADCC6000B898CA /* stack.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D065DE016ADCC6000B898CA /* stack.c */; };
-		2D065DE316ADCD4500B898CA /* vm.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D065DE216ADCD4500B898CA /* vm.c */; };
 		2D065DE516ADD42B00B898CA /* parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D065DE416ADD42B00B898CA /* parser.c */; };
-		2D065DE716ADD99700B898CA /* lexer.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D065DE616ADD99700B898CA /* lexer.c */; };
 		2D065DEA16ADE89C00B898CA /* readFile.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D065DE916ADE89C00B898CA /* readFile.c */; };
 		2DE9790E16A85D6800BE35BD /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DE9790D16A85D6800BE35BD /* main.c */; };
 		2DE9791016A85D6800BE35BD /* WraitheCMS.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2DE9790F16A85D6800BE35BD /* WraitheCMS.1 */; };
@@ -34,12 +31,8 @@
 /* Begin PBXFileReference section */
 		2D065DDA16ADCABE00B898CA /* WraitheCMS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WraitheCMS.h; sourceTree = "<group>"; };
 		2D065DDC16ADCB5100B898CA /* text.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = text.c; sourceTree = "<group>"; };
-		2D065DDE16ADCB8E00B898CA /* ast.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ast.c; sourceTree = "<group>"; };
 		2D065DE016ADCC6000B898CA /* stack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stack.c; sourceTree = "<group>"; };
-		2D065DE216ADCD4500B898CA /* vm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vm.c; sourceTree = "<group>"; };
 		2D065DE416ADD42B00B898CA /* parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = parser.c; sourceTree = "<group>"; };
-		2D065DE616ADD99700B898CA /* lexer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lexer.c; sourceTree = "<group>"; };
-		2D065DE816ADE6B300B898CA /* WraitheLexer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WraitheLexer.h; sourceTree = "<group>"; };
 		2D065DE916ADE89C00B898CA /* readFile.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = readFile.c; sourceTree = "<group>"; };
 		2DE9790916A85D6800BE35BD /* WraitheCMS */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = WraitheCMS; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE9790D16A85D6800BE35BD /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
@@ -77,15 +70,11 @@
 			isa = PBXGroup;
 			children = (
 				2DE9790D16A85D6800BE35BD /* main.c */,
-				2D065DDE16ADCB8E00B898CA /* ast.c */,
-				2D065DE616ADD99700B898CA /* lexer.c */,
 				2D065DE416ADD42B00B898CA /* parser.c */,
 				2D065DE916ADE89C00B898CA /* readFile.c */,
 				2D065DE016ADCC6000B898CA /* stack.c */,
 				2D065DDC16ADCB5100B898CA /* text.c */,
-				2D065DE216ADCD4500B898CA /* vm.c */,
 				2D065DDA16ADCABE00B898CA /* WraitheCMS.h */,
-				2D065DE816ADE6B300B898CA /* WraitheLexer.h */,
 				2DE9790F16A85D6800BE35BD /* WraitheCMS.1 */,
 			);
 			path = WraitheCMS;
@@ -144,11 +133,8 @@
 			files = (
 				2DE9790E16A85D6800BE35BD /* main.c in Sources */,
 				2D065DDD16ADCB5100B898CA /* text.c in Sources */,
-				2D065DDF16ADCB8E00B898CA /* ast.c in Sources */,
 				2D065DE116ADCC6000B898CA /* stack.c in Sources */,
-				2D065DE316ADCD4500B898CA /* vm.c in Sources */,
 				2D065DE516ADD42B00B898CA /* parser.c in Sources */,
-				2D065DE716ADD99700B898CA /* lexer.c in Sources */,
 				2D065DEA16ADE89C00B898CA /* readFile.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

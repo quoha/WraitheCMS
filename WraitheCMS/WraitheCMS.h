@@ -34,19 +34,6 @@ typedef struct WraitheCMS_Text      WraitheCMS_Text;
 typedef struct WraitheCMS_Source    WraitheCMS_Source;
 typedef struct WraitheCMS_StackNode WraitheCMS_StackNode;
 typedef struct WraitheCMS_Stack     WraitheCMS_Stack;
-typedef struct WraitheCMS_AST       WraitheCMS_AST;
-typedef struct WraitheCMS_VM        WraitheCMS_VM;
-
-
-//----------------------------------------------------------------------
-//
-struct WraitheCMS_AST {
-    char            *sourceName;
-    int              sourceLine;
-    int            (*code)(WraitheCMS_VM *vm, WraitheCMS_Stack *stack);
-    WraitheCMS_AST  *next;
-    void            *data;
-};
 
 
 //----------------------------------------------------------------------
@@ -88,55 +75,14 @@ struct WraitheCMS_Text {
 
 //----------------------------------------------------------------------
 //
-struct WraitheCMS_VM {
-    WraitheCMS_AST *currInstruction;
-    WraitheCMS_AST *nextInstruction;
-    int             maxErrors;
-    int             traceLevel;
-    char          **errmgs;
-
-    int (*exec)(WraitheCMS_VM *vm, WraitheCMS_AST *ast, WraitheCMS_Stack *stack);
-};
-
-
-//----------------------------------------------------------------------
-//
-#define AST WraitheCMS_AST
-#define VM  WraitheCMS_VM
-
-
-//----------------------------------------------------------------------
-//
-#define VM_OK     0
-#define VM_ERRINT 1
-#define VM_ERR    2
-#define SN_NULL   0
-#define SN_TEXT   1
-
-
-//----------------------------------------------------------------------
-//
-WraitheCMS_AST       *WraitheCMS_NewAST(int (*code)(WraitheCMS_VM *vm, WraitheCMS_Stack *stack));
 WraitheCMS_StackNode *WraitheCMS_NewStackNode(void);
 WraitheCMS_Stack     *WraitheCMS_NewStack(void);
-WraitheCMS_Text      *WraitheCMS_NewText(const char *data_, int length);
-WraitheCMS_VM        *WraitheCMS_NewVM(void);
 WraitheCMS_Text      *WraitheCMS_Stack_PopTop(WraitheCMS_Stack *stack);
 WraitheCMS_StackNode *WraitheCMS_Stack_PushTop(WraitheCMS_Stack *stack, WraitheCMS_Text *t);
 void                  WraitheCMS_Stack_Dump(WraitheCMS_Stack *stack);
+WraitheCMS_Text      *WraitheCMS_NewText(const char *data_, int length);
 
-
-//----------------------------------------------------------------------
-// executable words that are used by the AST
-//
-int F_If(WraitheCMS_VM *vm, WraitheCMS_Stack *stack);
-int F_NoOp(WraitheCMS_VM *vm, WraitheCMS_Stack *stack);
-
-
-//----------------------------------------------------------------------
-//
-WraitheCMS_Text *ReadFile(const char *fileName, int forceNewLine, int trimTrailingNewline);
-
-WraitheCMS_AST *ViewParse(WraitheCMS_Stack *stack, WraitheCMS_Source *source);
+WraitheCMS_Text      *ReadFile(const char *fileName, int forceNewLine, int trimTrailingNewline);
+int                   ViewParse(WraitheCMS_Stack *stack, WraitheCMS_Source *source);
 
 #endif

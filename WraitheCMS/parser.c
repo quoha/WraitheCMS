@@ -71,31 +71,11 @@ struct Lexeme {
 
 //----------------------------------------------------------------------
 //
-typedef struct PState PState;
-struct PState {
-    Lexeme         *lex;
-    WraitheCMS_AST *root;
-    WraitheCMS_AST *tail;
-};
-
-
-//----------------------------------------------------------------------
-//
 static Lexeme *ViewLexer(WraitheCMS_Source *source);
 static Lexeme *ViewLexer_Code(WraitheCMS_Source *source);
 static Lexeme *ViewLexer_EOF(WraitheCMS_Source *source);
 static Lexeme *ViewLexer_Text(WraitheCMS_Source *source);
 static Lexeme *ViewLexer_Word(WraitheCMS_Source *source);
-static int     Accept(PState *ps, int kind);
-static int     AcceptElse(PState *ps);
-static int     AcceptEndIf(PState *ps);
-static int     AcceptIf(PState *ps);
-static int     AcceptText(PState *ps);
-static int     AcceptWord(PState *ps);
-static int     Expect(PState *ps, int kind);
-static int     Match(PState *ps, int kind);
-static int     ParseIf(PState *ps);
-static int     ParseWord(PState *ps);
 
 //----------------------------------------------------------------------
 //
@@ -188,224 +168,30 @@ Lexeme *ViewParser(WraitheCMS_Stack *stack, Lexeme *lex, int doExecute, int ifLe
 //
 // all ASTs start and end with no-ops
 //
-WraitheCMS_AST *ViewParse(WraitheCMS_Stack *stack, WraitheCMS_Source *source) {
+int ViewParse(WraitheCMS_Stack *stack, WraitheCMS_Source *source) {
     printf("parse:\tentered\n");
-
-    PState ps;
-    ps.root = WraitheCMS_NewAST(F_NoOp);
-    ps.tail = ps.root;
 
     source->line = 1;
     source->curr = source->data->text;
 
-    ps.lex  = ViewLexer(source);
-    if (!ps.lex) {
+    Lexeme *lex = ViewLexer(source);
+    if (!lex) {
         perror("ViewLexer");
         return 0;
     }
-    Lexeme *view = ps.lex;
+
+    Lexeme *view = lex;
     while (view) {
         printf(" view:\t%2d %2d >>> %s\n", view->line, view->kind, view->data);
         view = view->next;
     }
 
-    ViewParser(stack, ps.lex, 1, 0);
+    Lexeme *result = ViewParser(stack, lex, 1, 0);
+    if (result && result->kind == lxEOF) {
+        return 1;
+    }
 
     return 0;
-    // parse the input
-    //
-    while (ps.lex->kind != lxEOF && ParseWord(&ps)) {
-        //
-    }
-    
-    if (!Expect(&ps, lxEOF)) {
-        // error - did not parse to end of input
-        //
-        printf("parse:\tfailed - did not find EOF as expected\n");
-        return 0;
-    }
-
-    ps.tail->next = WraitheCMS_NewAST(F_NoOp);
-
-    printf("parse:\texiting\n");
-    
-    return ps.root;
-}
-
-
-//----------------------------------------------------------------------
-//
-int Accept(PState *ps, int kind) {
-    if (Match(ps, kind)) {
-        ps->lex = ps->lex->next;
-        return 1;
-    }
-    return 0;
-}
-
-
-//----------------------------------------------------------------------
-//
-int AcceptElse(PState *ps) {
-    if (Match(ps, lxELSE)) {
-        ps->lex = ps->lex->next;
-        return 1;
-    }
-    return 0;
-}
-
-
-//----------------------------------------------------------------------
-//
-int AcceptEndIf(PState *ps) {
-    if (Match(ps, lxENDIF)) {
-        ps->lex = ps->lex->next;
-        return 1;
-    }
-    return 0;
-}
-
-
-//----------------------------------------------------------------------
-//
-int AcceptIf(PState *ps) {
-    if (Match(ps, lxIF)) {
-        ps->lex = ps->lex->next;
-        return 1;
-    }
-    return 0;
-}
-
-
-//----------------------------------------------------------------------
-//
-int AcceptText(PState *ps) {
-    if (Match(ps, lxTEXT)) {
-        WraitheCMS_AST *ast = WraitheCMS_NewAST(F_NoOp);
-        ps->lex = ps->lex->next;
-        return 1;
-    }
-    return 0;
-}
-
-
-//----------------------------------------------------------------------
-//
-int AcceptWord(PState *ps) {
-    if (Match(ps, lxWORD)) {
-        // if the word is special, assign a special function to it.
-        // otherwise, look it up in the symbol table and add it to
-        // the tree
-        //
-        int (*code)(WraitheCMS_VM *vm, WraitheCMS_Stack *stack) = F_NoOp;
-
-        // append the node to the current tree
-        //
-        WraitheCMS_AST *ast = WraitheCMS_NewAST(code);
-
-        ps->lex = ps->lex->next;
-        return 1;
-    }
-    return 0;
-}
-
-
-//----------------------------------------------------------------------
-//
-int Expect(PState *ps, int kind) {
-    if (Accept(ps, kind)) {
-        return 1;
-    }
-    printf("parse:\terror:\texpected %d found %d\n", kind, ps->lex ? ps->lex->kind : -1);
-    return 0;
-}
-
-
-//----------------------------------------------------------------------
-//
-int Match(PState *ps, int kind) {
-    return (ps->lex && ps->lex->kind == kind) ? 1 : 0;
-}
-
-
-//----------------------------------------------------------------------
-//
-//    word := TEXT | WORD | if
-//
-int ParseWord(PState *ps) {
-    printf("parseWord line %d %s\n", ps->lex->line, ps->lex->data);
-    Lexeme *lex = ps->lex;
-    
-    if (AcceptText(ps)) {
-        return 1;
-    }
-
-    if (AcceptWord(ps)) {
-        return 1;
-    }
-
-    if (ParseIf(ps)) {
-        return 1;
-    }
-
-    printf("parse:\texpected text, word or if on line %d\n", lex->line);
-    printf("\tfound %d\n", lex->kind);
-    return 0;
-}
-
-
-//----------------------------------------------------------------------
-//
-//    if   := IF word* ( ELSE word* )? ENDIF
-//
-int ParseIf(PState *ps) {
-    printf("parseIf   line %d %s\n", ps->lex->line, ps->lex->data);
-
-    WraitheCMS_AST *ast = WraitheCMS_NewAST(F_If);
-
-    Lexeme *pIf = ps->lex;
-    if (!AcceptIf(ps)) {
-        printf("parse:\texpected if on line %5d\n", pIf->line);
-        return 0;
-    }
-
-    // ast->bz = then branch
-    //
-    Lexeme *pThen = 0;
-    while (!Match(ps, lxELSE) && !Match(ps, lxENDIF) && !Match(ps, lxEOF)) {
-        if (!pThen) {
-            pThen = ps->lex;
-            printf("parseThen line %d %s\n", pThen->line, pThen->data);
-        }
-        if (!ParseWord(ps)) {
-            printf("parse:\nexpected word on line %5d\n", ps->lex->line);
-            return 0;
-        }
-    }
-
-    // ast->bnz = else branch
-    //
-    Lexeme *pElse = ps->lex;
-    printf("parseElse line %d %s\n", pElse->line, pElse->data);
-    if (!AcceptElse(ps)) {
-        pElse = 0;
-    }
-
-    while (!Match(ps, lxENDIF) && !Match(ps, lxEOF)) {
-        if (!ParseWord(ps)) {
-            printf("parse:\nexpected word on line %5d\n", ps->lex->line);
-            return 0;
-        }
-    }
-
-    Lexeme *pEndIf = ps->lex;
-    printf("parseEnIf line %d %s\n", pEndIf->line, pEndIf->data);
-    if (!AcceptEndIf(ps)) {
-        printf("parse:\nexpected endif on line %d to %d %s\n", pIf->line, pEndIf->line, ps->lex->data);
-        return 0;
-    }
-
-    return 1;
 }
 
 

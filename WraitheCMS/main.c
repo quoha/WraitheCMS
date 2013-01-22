@@ -26,7 +26,6 @@
 //
 
 #include "WraitheCMS.h"
-#include "WraitheLexer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -55,25 +54,16 @@ int main(int argc, const char * argv[])
     WraitheCMS_Stack_PushTop(stack, 0);
     WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText("true", -1));
 
-    WraitheCMS_AST *astView = ViewParse(stack, &source);
+    if (!ViewParse(stack, &source)) {
+        printf("error:\tunable to successfully parse the view file '%s'\n", source.source);
+        WraitheCMS_Stack_Dump(stack);
+        return 2;
+    }
+
+    printf(" info:\tsuccessfully ran the view file %s\n", source.source);
+
     WraitheCMS_Stack_Dump(stack);
 
-    if (!astView) {
-        printf("error:\tunable to successfully parse the view file '%s'\n", source.source);
-        return 2;
-    }
-
-    WraitheCMS_VM *vm = WraitheCMS_NewVM();
-    if (!vm) {
-        perror("new VM");
-        return 0;
-    }
-
-    if (vm->exec(vm, astView, stack) != VM_OK) {
-        printf("\nerror:\tvirtual machine failed\n\n");
-        return 2;
-    }
-    
     return 0;
 }
 

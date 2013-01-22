@@ -44,8 +44,7 @@ struct WraitheCMS_AST {
     char            *sourceName;
     int              sourceLine;
     int            (*code)(WraitheCMS_VM *vm, WraitheCMS_Stack *stack);
-    WraitheCMS_AST  *bz;
-    WraitheCMS_AST  *bnz;
+    WraitheCMS_AST  *next;
     void            *data;
 };
 
@@ -124,6 +123,7 @@ WraitheCMS_Text      *WraitheCMS_NewText(const char *data_, int length);
 WraitheCMS_VM        *WraitheCMS_NewVM(void);
 WraitheCMS_Text      *WraitheCMS_Stack_PopTop(WraitheCMS_Stack *stack);
 WraitheCMS_StackNode *WraitheCMS_Stack_PushTop(WraitheCMS_Stack *stack, WraitheCMS_Text *t);
+void                  WraitheCMS_Stack_Dump(WraitheCMS_Stack *stack);
 
 
 //----------------------------------------------------------------------
@@ -137,6 +137,6 @@ int F_NoOp(WraitheCMS_VM *vm, WraitheCMS_Stack *stack);
 //
 WraitheCMS_Text *ReadFile(const char *fileName, int forceNewLine, int trimTrailingNewline);
 
-WraitheCMS_AST *ViewParse(WraitheCMS_Source *source);
+WraitheCMS_AST *ViewParse(WraitheCMS_Stack *stack, WraitheCMS_Source *source);
 
 #endif

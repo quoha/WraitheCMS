@@ -39,8 +39,8 @@ WraitheCMS_AST *WraitheCMS_NewAST(int (*code)(WraitheCMS_VM *vm, WraitheCMS_Stac
     }
     memset(ast, 0, sizeof(*ast));
     ast->code = code;
-    ast->bz   = 0;
-    ast->bnz  = 0;
+    ast->next = 0;
+    ast->data = 0;
     return ast;
 }
 
@@ -63,10 +63,10 @@ int F_If(WraitheCMS_VM *vm, WraitheCMS_Stack *stack) {
     WraitheCMS_Text *t = WraitheCMS_Stack_PopTop(stack);
     if (t->isNull) {
         printf("   vm:\texecuting if (null)\n");
-        vm->nextInstruction = vm->currInstruction->bnz;
+        vm->nextInstruction = (WraitheCMS_AST *)(vm->currInstruction->data);
     } else {
         printf("   vm:\texecuting if (%s)\n", t->text);
-        vm->nextInstruction = vm->currInstruction->bz;
+        vm->nextInstruction = vm->currInstruction->next;
     }
     return VM_OK;
 }
@@ -75,7 +75,7 @@ int F_If(WraitheCMS_VM *vm, WraitheCMS_Stack *stack) {
 //----------------------------------------------------------------------
 //
 int F_NoOp(WraitheCMS_VM *vm, WraitheCMS_Stack *stack) {
-    vm->nextInstruction = vm->currInstruction->bz;
+    vm->nextInstruction = vm->currInstruction->next;
     if (vm->traceLevel > 3) {
         printf("   vm:\texecuting no-op\n");
     }

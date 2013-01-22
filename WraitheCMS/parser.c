@@ -62,6 +62,7 @@ struct Lexeme {
     const char *source;
     int         line;
     int         kind;
+    int         length;
     Lexeme     *prev;
     Lexeme     *next;
     char        data[1];
@@ -96,6 +97,72 @@ static int     Match(PState *ps, int kind);
 static int     ParseIf(PState *ps);
 static int     ParseWord(PState *ps);
 
+//----------------------------------------------------------------------
+//
+//    view := word* END_OF_INPUT
+//    word := TEXT | WORD | if
+//    if   := IF word* ( ELSE word* )? ENDIF
+//
+//    view := word* END_OF_INPUT
+//
+Lexeme *ViewParser(WraitheCMS_Stack *stack, Lexeme *lex, int doExecute, int ifLevel) {
+    while (lex && lex->kind != lxEOF) {
+        // normal action for text is to push it onto the stack
+        if (lex->kind == lxTEXT) {
+            printf("stack:\t%*c %-8s %s\n", ifLevel*2 + 1, '.', doExecute ? "push" : "ignore", lex->data);
+            if (doExecute) {
+                WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText(lex->data, lex->length));
+            }
+            lex = lex->next;
+        } else if (lex->kind == lxWORD) {
+            printf(".word:\t%*c %-8s %s\n", ifLevel*2 + 1, '.', lex->data, doExecute ? "exec" : "ignore");
+            if (doExecute) {
+            }
+            lex = lex->next;
+        } else if (lex->kind == lxIF) {
+            // check the state of the token
+            int truth = ifLevel - 1;
+            
+            printf(".word:\t%*c %-8s %6s %s\n", ifLevel*2 + 1, '.', lex->data, doExecute ? "exec" : "ignore", truth ? "true" : "false");
+            Lexeme *lIf = lex;
+
+            // execute the TRUE branch
+            //
+            lex = ViewParser(stack, lex->next, doExecute ? truth : 0, ifLevel+1);
+            if (!lex) {
+                printf("parser:\tif on line %d was not terminated\n", lIf->line);
+                return 0;
+            }
+
+            // execute the FALSE branch
+            //
+            if (lex->kind == lxELSE) {
+                printf(".word:\t%*c %-8s %s\n", ifLevel*2 + 1, '.', lex->data, !truth ? "exec" : "ignore");
+                lex = ViewParser(stack, lex->next, doExecute ? !truth : 0, ifLevel+1);
+                if (!lex) {
+                    printf("parser:\tif on line %d was not terminated with else ... endif\n", lIf->line);
+                    return 0;
+                }
+            }
+
+            // confirm that we have an ENDIF
+            //
+            if (lex->kind != lxENDIF) {
+                printf("parser:\tif on line %d was not terminated with endif\n", lIf->line);
+                return 0;
+            }
+            lex = lex->next;
+        } else if (lex->kind == lxELSE) {
+            return lex;
+        } else if (lex->kind == lxENDIF) {
+            return lex;
+        } else {
+            printf("....?:\t%*c %-6s %s\n", ifLevel*2 + 1, '.', doExecute ? "exec" : "ignore", lex->data);
+            lex = lex->next;
+        }
+    }
+    return lex;
+}
 
 
 //----------------------------------------------------------------------
@@ -121,7 +188,7 @@ static int     ParseWord(PState *ps);
 //
 // all ASTs start and end with no-ops
 //
-WraitheCMS_AST *ViewParse(WraitheCMS_Source *source) {
+WraitheCMS_AST *ViewParse(WraitheCMS_Stack *stack, WraitheCMS_Source *source) {
     printf("parse:\tentered\n");
 
     PState ps;
@@ -142,6 +209,9 @@ WraitheCMS_AST *ViewParse(WraitheCMS_Source *source) {
         view = view->next;
     }
 
+    ViewParser(stack, ps.lex, 1, 0);
+
+    return 0;
     // parse the input
     //
     while (ps.lex->kind != lxEOF && ParseWord(&ps)) {
@@ -155,7 +225,7 @@ WraitheCMS_AST *ViewParse(WraitheCMS_Source *source) {
         return 0;
     }
 
-    ps.tail->bz = WraitheCMS_NewAST(F_NoOp);
+    ps.tail->next = WraitheCMS_NewAST(F_NoOp);
 
     printf("parse:\texiting\n");
     
@@ -178,7 +248,6 @@ int Accept(PState *ps, int kind) {
 //
 int AcceptElse(PState *ps) {
     if (Match(ps, lxELSE)) {
-        WraitheCMS_AST *ast = WraitheCMS_NewAST(F_NoOp);
         ps->lex = ps->lex->next;
         return 1;
     }
@@ -190,7 +259,6 @@ int AcceptElse(PState *ps) {
 //
 int AcceptEndIf(PState *ps) {
     if (Match(ps, lxENDIF)) {
-        WraitheCMS_AST *ast = WraitheCMS_NewAST(F_NoOp);
         ps->lex = ps->lex->next;
         return 1;
     }
@@ -202,7 +270,6 @@ int AcceptEndIf(PState *ps) {
 //
 int AcceptIf(PState *ps) {
     if (Match(ps, lxIF)) {
-        WraitheCMS_AST *ast = WraitheCMS_NewAST(F_If);
         ps->lex = ps->lex->next;
         return 1;
     }
@@ -294,12 +361,16 @@ int ParseWord(PState *ps) {
 int ParseIf(PState *ps) {
     printf("parseIf   line %d %s\n", ps->lex->line, ps->lex->data);
 
+    WraitheCMS_AST *ast = WraitheCMS_NewAST(F_If);
+
     Lexeme *pIf = ps->lex;
     if (!AcceptIf(ps)) {
         printf("parse:\texpected if on line %5d\n", pIf->line);
         return 0;
     }
 
+    // ast->bz = then branch
+    //
     Lexeme *pThen = 0;
     while (!Match(ps, lxELSE) && !Match(ps, lxENDIF) && !Match(ps, lxEOF)) {
         if (!pThen) {
@@ -312,6 +383,8 @@ int ParseIf(PState *ps) {
         }
     }
 
+    // ast->bnz = else branch
+    //
     Lexeme *pElse = ps->lex;
     printf("parseElse line %d %s\n", pElse->line, pElse->data);
     if (!AcceptElse(ps)) {
@@ -458,6 +531,7 @@ Lexeme *ViewLexer_Text(WraitheCMS_Source *source) {
             memset(text, 0, sizeof(*text) + stopText - startText);
             text->source = source->source;
             text->line   = startLine;
+            text->length = (int)(stopText - startText);
             text->kind   = lxTEXT;
             memcpy(text->data, startText, stopText - startText);
 
@@ -523,6 +597,7 @@ Lexeme *ViewLexer_Word(WraitheCMS_Source *source) {
         memset(word, 0, sizeof(*word) + stopWord - startWord);
         word->source = source->source;
         word->line   = startLine;
+        word->length = (int)(stopWord - startWord);
         word->kind   = (*startWord == '<') ? lxTEXT : lxWORD;
         memcpy(word->data, startWord, stopWord - startWord);
         if (word->kind == lxWORD && strcmp(word->data, "if") == 0) {

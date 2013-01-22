@@ -51,16 +51,18 @@ int main(int argc, const char * argv[])
     }
     printf(">>>%s<<<\n\n", source.data->text);
 
-    WraitheCMS_AST *astView = ViewParse(&source);
+    WraitheCMS_Stack *stack = WraitheCMS_NewStack();
+    WraitheCMS_Stack_PushTop(stack, 0);
+    WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText("true", -1));
+
+    WraitheCMS_AST *astView = ViewParse(stack, &source);
+    WraitheCMS_Stack_Dump(stack);
+
     if (!astView) {
         printf("error:\tunable to successfully parse the view file '%s'\n", source.source);
         return 2;
     }
 
-    WraitheCMS_Stack *stack = WraitheCMS_NewStack();
-    WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText("true", -1));
-    WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText(0, 0));
-    
     WraitheCMS_VM *vm = WraitheCMS_NewVM();
     if (!vm) {
         perror("new VM");

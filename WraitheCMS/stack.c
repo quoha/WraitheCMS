@@ -57,6 +57,17 @@ WraitheCMS_Stack *WraitheCMS_NewStack(void) {
 
 //----------------------------------------------------------------------
 //
+void WraitheCMS_Stack_Dump(WraitheCMS_Stack *stack) {
+    int idx = 0;
+    WraitheCMS_StackNode *node = stack->top;
+    while (node) {
+        printf("stack:\t%4d %s\n", idx++, node->text ? node->text->text : "(null)");
+        node = node->prev;
+    }
+}
+
+//----------------------------------------------------------------------
+//
 WraitheCMS_Text *WraitheCMS_Stack_PopTop(WraitheCMS_Stack *stack) {
     WraitheCMS_Text *t = 0;
     if (stack && stack->top) {

@@ -40,27 +40,18 @@ int main(int argc, const char * argv[])
     printf("WraitheCMS is licensed under the MIT license.\n");
     printf("Please see the file LICENSE for details.\n\n");
 
-    const char *viewFile = "/Users/mdhender/Software/WraitheCMS/data/article.tpl";
-    char *viewData = ReadFile(viewFile, 0, 0);
-    if (!viewData) {
-        perror(viewFile);
+    WraitheCMS_Source source;
+    source.source = "/Users/mdhender/Software/WraitheCMS/data/article.tpl";
+    source.line   = 1;
+    source.curr   = 0;
+    source.data   = ReadFile(source.source, 0, 0);
+    if (!source.data) {
+        perror(source.source);
         return 2;
     }
-    printf("%s\n", viewData);
-    Lexer  *viewLexer = NewLexer(viewFile, viewData);
-    if (!viewLexer) {
-        perror("viewLexer");
-        return 2;
-    }
-    Lexeme *view = ViewLexer(viewLexer);
-    if (!view) {
-        perror("ViewLexer");
-        return 2;
-    }
-    while (view) {
-        printf(" view:\t%2d %2d %s\n", view->line, view->kind, view->data);
-        view = view->next;
-    }
+    printf(">>>%s<<<\n\n", source.data->text);
+
+    void *parse = ViewParse(&source);
 
     WraitheCMS_Stack *stack = WraitheCMS_NewStack();
     WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText("true", -1));

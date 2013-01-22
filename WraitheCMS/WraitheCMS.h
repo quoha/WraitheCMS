@@ -31,6 +31,7 @@
 //----------------------------------------------------------------------
 //
 typedef struct WraitheCMS_Text      WraitheCMS_Text;
+typedef struct WraitheCMS_Source    WraitheCMS_Source;
 typedef struct WraitheCMS_StackNode WraitheCMS_StackNode;
 typedef struct WraitheCMS_Stack     WraitheCMS_Stack;
 typedef struct WraitheCMS_AST       WraitheCMS_AST;
@@ -46,6 +47,16 @@ struct WraitheCMS_AST {
     WraitheCMS_AST  *bz;
     WraitheCMS_AST  *bnz;
     void            *data;
+};
+
+
+//----------------------------------------------------------------------
+//
+struct WraitheCMS_Source {
+    const char     *source;
+    int             line;
+    WraitheCMS_Text *data;
+    char            *curr;
 };
 
 
@@ -124,7 +135,8 @@ int F_NoOp(WraitheCMS_VM *vm, WraitheCMS_Stack *stack);
 
 //----------------------------------------------------------------------
 //
-char *ReadFile(const char *fileName, int forceNewLine, int trimTrailingNewline);
+WraitheCMS_Text *ReadFile(const char *fileName, int forceNewLine, int trimTrailingNewline);
 
+void *ViewParse(WraitheCMS_Source *source);
 
 #endif

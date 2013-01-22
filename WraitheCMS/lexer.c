@@ -31,6 +31,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#if 0
 //----------------------------------------------------------------------
 //
 static Lexeme *ViewLexer_Code(Lexer *l);
@@ -241,3 +242,4 @@ Lexeme *ViewLexer_Word(Lexer *l) {
 }
 
 
+#endif

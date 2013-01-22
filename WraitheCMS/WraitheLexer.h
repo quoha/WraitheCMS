@@ -28,44 +28,4 @@
 #ifndef WraitheCMS_WraitheLexer_h
 #define WraitheCMS_WraitheLexer_h
 
-//----------------------------------------------------------------------
-//
-#define lxEOF  -1
-#define lxTEXT  1
-#define lxWORD  2
-
-
-//----------------------------------------------------------------------
-//
-typedef struct Lexer Lexer;
-typedef struct Lexeme Lexeme;
-
-
-//----------------------------------------------------------------------
-//
-struct Lexer {
-    int         line;
-    const char *source;
-    const char *curr;
-};
-
-
-//----------------------------------------------------------------------
-//
-struct Lexeme {
-    const char *source;
-    int         line;
-    int         kind;
-    Lexeme     *prev;
-    Lexeme     *next;
-    char        data[1];
-};
-
-
-//----------------------------------------------------------------------
-//
-Lexer  *NewLexer(const char *source, char *data);
-Lexeme *ArticleLexer(Lexer *l);
-Lexeme *ViewLexer(Lexer *l);
-
 #endif

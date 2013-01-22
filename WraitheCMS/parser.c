@@ -33,12 +33,13 @@
 
 //----------------------------------------------------------------------
 //
-#define lxEOF  -1
-#define lxTEXT  1
-#define lxWORD  2
-#define lxIF    3
-#define lxELSE  4
-#define lxENDIF 5
+#define lxEOF    -1
+#define lxTEXT    1
+#define lxWORD    2
+#define lxIF      3
+#define lxELSE    4
+#define lxENDIF   5
+#define lxINCLUDE 6
 
 
 //----------------------------------------------------------------------
@@ -71,78 +72,12 @@ struct Lexeme {
 
 //----------------------------------------------------------------------
 //
+static Lexeme *ViewParser(WraitheCMS_SymTab *symtab, WraitheCMS_Stack *stack, const char **searchPath, Lexeme *lex, int doExecute, int ifLevel);
 static Lexeme *ViewLexer(WraitheCMS_Source *source);
 static Lexeme *ViewLexer_Code(WraitheCMS_Source *source);
 static Lexeme *ViewLexer_EOF(WraitheCMS_Source *source);
 static Lexeme *ViewLexer_Text(WraitheCMS_Source *source);
 static Lexeme *ViewLexer_Word(WraitheCMS_Source *source);
-
-//----------------------------------------------------------------------
-//
-//    view := word* END_OF_INPUT
-//    word := TEXT | WORD | if
-//    if   := IF word* ( ELSE word* )? ENDIF
-//
-//    view := word* END_OF_INPUT
-//
-Lexeme *ViewParser(WraitheCMS_Stack *stack, Lexeme *lex, int doExecute, int ifLevel) {
-    while (lex && lex->kind != lxEOF) {
-        // normal action for text is to push it onto the stack
-        if (lex->kind == lxTEXT) {
-            printf("stack:\t%*c %-8s %s\n", ifLevel*2 + 1, '.', doExecute ? "push" : "ignore", lex->data);
-            if (doExecute) {
-                WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText(lex->data, lex->length));
-            }
-            lex = lex->next;
-        } else if (lex->kind == lxWORD) {
-            printf(".word:\t%*c %-8s %s\n", ifLevel*2 + 1, '.', lex->data, doExecute ? "exec" : "ignore");
-            if (doExecute) {
-            }
-            lex = lex->next;
-        } else if (lex->kind == lxIF) {
-            // check the state of the token
-            int truth = ifLevel - 1;
-            
-            printf(".word:\t%*c %-8s %6s %s\n", ifLevel*2 + 1, '.', lex->data, doExecute ? "exec" : "ignore", truth ? "true" : "false");
-            Lexeme *lIf = lex;
-
-            // execute the TRUE branch
-            //
-            lex = ViewParser(stack, lex->next, doExecute ? truth : 0, ifLevel+1);
-            if (!lex) {
-                printf("parser:\tif on line %d was not terminated\n", lIf->line);
-                return 0;
-            }
-
-            // execute the FALSE branch
-            //
-            if (lex->kind == lxELSE) {
-                printf(".word:\t%*c %-8s %s\n", ifLevel*2 + 1, '.', lex->data, !truth ? "exec" : "ignore");
-                lex = ViewParser(stack, lex->next, doExecute ? !truth : 0, ifLevel+1);
-                if (!lex) {
-                    printf("parser:\tif on line %d was not terminated with else ... endif\n", lIf->line);
-                    return 0;
-                }
-            }
-
-            // confirm that we have an ENDIF
-            //
-            if (lex->kind != lxENDIF) {
-                printf("parser:\tif on line %d was not terminated with endif\n", lIf->line);
-                return 0;
-            }
-            lex = lex->next;
-        } else if (lex->kind == lxELSE) {
-            return lex;
-        } else if (lex->kind == lxENDIF) {
-            return lex;
-        } else {
-            printf("....?:\t%*c %-6s %s\n", ifLevel*2 + 1, '.', doExecute ? "exec" : "ignore", lex->data);
-            lex = lex->next;
-        }
-    }
-    return lex;
-}
 
 
 //----------------------------------------------------------------------
@@ -168,30 +103,135 @@ Lexeme *ViewParser(WraitheCMS_Stack *stack, Lexeme *lex, int doExecute, int ifLe
 //
 // all ASTs start and end with no-ops
 //
-int ViewParse(WraitheCMS_Stack *stack, WraitheCMS_Source *source) {
-    printf("parse:\tentered\n");
-
+int ViewParse(WraitheCMS_SymTab *symtab, WraitheCMS_Stack *stack, const char **searchPath, WraitheCMS_Source *source) {
+    // make sure we start at the top of the source
+    //
     source->line = 1;
     source->curr = source->data->text;
 
     Lexeme *lex = ViewLexer(source);
     if (!lex) {
-        perror("ViewLexer");
+        perror("ViewLexer failed");
         return 0;
     }
 
-    Lexeme *view = lex;
-    while (view) {
-        printf(" view:\t%2d %2d >>> %s\n", view->line, view->kind, view->data);
-        view = view->next;
+    if (0) {
+        Lexeme *view = lex;
+        while (view) {
+            printf(" view:\t%2d %2d >>> %s\n", view->line, view->kind, view->data);
+            view = view->next;
+        }
     }
 
-    Lexeme *result = ViewParser(stack, lex, 1, 0);
+    Lexeme *result = ViewParser(symtab, stack, searchPath, lex, 1, 0);
     if (result && result->kind == lxEOF) {
         return 1;
     }
 
     return 0;
+}
+
+
+//----------------------------------------------------------------------
+//
+//    view := word* END_OF_INPUT
+//    word := TEXT | WORD | if
+//    if   := IF word* ( ELSE word* )? ENDIF
+//
+//    view := word* END_OF_INPUT
+//
+Lexeme *ViewParser(WraitheCMS_SymTab *symtab, WraitheCMS_Stack *stack, const char **searchPath, Lexeme *lex, int doExecute, int ifLevel) {
+    while (lex && lex->kind != lxEOF) {
+        // normal action for text is to push it onto the stack
+        if (lex->kind == lxTEXT) {
+            printf("stack:\t%*c %-8s %s\n", ifLevel*2 + 1, '.', doExecute ? "push" : "ignore", lex->data);
+            if (doExecute) {
+                WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText(lex->data, lex->length));
+            }
+            lex = lex->next;
+        } else if (lex->kind == lxWORD) {
+            printf(".word:\t%*c %-8s %s\n", ifLevel*2 + 1, '.', lex->data, doExecute ? "exec" : "ignore");
+            if (doExecute) {
+                // lookup word
+                WraitheCMS_Symbol *s = WraitheCMS_SymTab_Find(symtab, lex->data);
+                if (!s) {
+                    printf(" view:\twarn -- pushing null word '%s'\n", lex->data);
+                    WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText("", 0));
+                } else {
+                    WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText(s->value, (int)strlen(s->value)));
+                }
+            }
+            lex = lex->next;
+        } else if (lex->kind == lxIF) {
+            // check the state of the token
+            int truth = ifLevel - 1;
+            
+            printf(".word:\t%*c %-8s %6s %s\n", ifLevel*2 + 1, '.', lex->data, doExecute ? "exec" : "ignore", truth ? "true" : "false");
+            Lexeme *lIf = lex;
+            
+            // execute the TRUE branch
+            //
+            lex = ViewParser(symtab, stack, searchPath, lex->next, doExecute ? truth : 0, ifLevel+1);
+            if (!lex) {
+                printf("parser:\tif on line %d was not terminated\n", lIf->line);
+                return 0;
+            }
+            
+            // execute the FALSE branch
+            //
+            if (lex->kind == lxELSE) {
+                printf(".word:\t%*c %-8s %s\n", ifLevel*2 + 1, '.', lex->data, !truth ? "exec" : "ignore");
+                lex = ViewParser(symtab, stack, searchPath, lex->next, doExecute ? !truth : 0, ifLevel+1);
+                if (!lex) {
+                    printf("parser:\tif on line %d was not terminated with else ... endif\n", lIf->line);
+                    return 0;
+                }
+            }
+            
+            // confirm that we have an ENDIF
+            //
+            if (lex->kind != lxENDIF) {
+                printf("parser:\tif on line %d was not terminated with endif\n", lIf->line);
+                return 0;
+            }
+            lex = lex->next;
+        } else if (lex->kind == lxELSE) {
+            return lex;
+        } else if (lex->kind == lxENDIF) {
+            return lex;
+        } else if (lex->kind == lxINCLUDE) {
+            if (doExecute) {
+                WraitheCMS_Text *fileName = WraitheCMS_Stack_PopTop(stack);
+                if (!fileName || fileName->isNull || fileName->text[0] == 0) {
+                    printf(" view:\twarning -- ignoring null 'include'\n");
+                } else {
+                    printf(" view:\tinclude '%s'\n", fileName->text);
+
+                    WraitheCMS_Source source;
+                    source.source = fileName->text;
+                    source.line   = 1;
+                    source.curr   = 0;
+                    source.data   = ReadFile(searchPath, source.source, 0, 0);
+                    if (!source.data) {
+                        perror(source.source);
+                        printf(" view:\terror loading file '%s'\n", source.source);
+                        return 0;
+                    }
+                    printf(">>>%s<<<\n\n", source.data->text);
+                    
+                    if (!ViewParse(symtab, stack, searchPath, &source)) {
+                        printf(" view:\terror including file '%s'\n", source.source);
+                        return 0;
+                    }
+                }
+            }
+            lex = lex->next;
+        } else {
+            printf("....?:\t%*c %-6s %s\n", ifLevel*2 + 1, '.', doExecute ? "exec" : "ignore", lex->data);
+            lex = lex->next;
+        }
+    }
+    return lex;
 }
 
 
@@ -204,7 +244,6 @@ Lexeme *ViewLexer(WraitheCMS_Source *source) {
     while (*(source->curr)) {
         Lexeme *text = ViewLexer_Text(source);
         if (text) {
-            printf("  lex:\tfound text\n");
             if (!tail) {
                 root = tail = text;
             } else {
@@ -219,7 +258,6 @@ Lexeme *ViewLexer(WraitheCMS_Source *source) {
         
         Lexeme *code = ViewLexer_Code(source);
         if (code) {
-            printf("  lex:\tfound code\n");
             if (!tail) {
                 root = tail = code;
             } else {
@@ -383,15 +421,29 @@ Lexeme *ViewLexer_Word(WraitheCMS_Source *source) {
         memset(word, 0, sizeof(*word) + stopWord - startWord);
         word->source = source->source;
         word->line   = startLine;
-        word->length = (int)(stopWord - startWord);
         word->kind   = (*startWord == '<') ? lxTEXT : lxWORD;
-        memcpy(word->data, startWord, stopWord - startWord);
+        int length = (int) (stopWord - startWord);
+        if (word->kind == lxTEXT) {
+            // need to strip the < and > from the text
+            //
+            length--;
+            if (length > 0 && startWord[length] == '>') {
+                length--;
+            }
+            startWord++;
+        }
+
+        word->length = length;
+        memcpy(word->data, startWord, length);
+
         if (word->kind == lxWORD && strcmp(word->data, "if") == 0) {
             word->kind = lxIF;
         } else if (word->kind == lxWORD && strcmp(word->data, "else") == 0) {
             word->kind = lxELSE;
         } else if (word->kind == lxWORD && strcmp(word->data, "endif") == 0) {
             word->kind = lxENDIF;
+        } else if (word->kind == lxWORD && strcmp(word->data, "include") == 0) {
+            word->kind = lxINCLUDE;
         }
     }
     

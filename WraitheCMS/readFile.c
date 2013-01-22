@@ -31,6 +31,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
+static char nameBuffer[4 * 1024];
 
 //----------------------------------------------------------------------
 //
@@ -42,15 +43,27 @@
 //
 // will leave text set to NULL and isNull set to TRUE if there are errors
 //
-WraitheCMS_Text *ReadFile(const char *fileName, int forceNewLine, int trimTrailingNewline) {
+WraitheCMS_Text *ReadFile(const char **searchPath, const char *fileName, int forceNewLine, int trimTrailingNewline) {
     WraitheCMS_Text *text = 0;
 
-	struct stat statBuf;
-	if (stat(fileName, &statBuf) == 0) {
+    int idx;
+    for (idx = 0; searchPath[idx]; idx++) {
+        snprintf(nameBuffer, 4000, "%s%s", searchPath[idx], fileName);
+        nameBuffer[4000] = 0;
+
+        printf(" info:\tReadFile searching %s\n", nameBuffer);
+
+        struct stat statBuf;
+        if (stat(nameBuffer, &statBuf) != 0) {
+            continue;
+        }
+
+        printf(" info:\tfound %s\n", nameBuffer);
+
         // allocate enough space for the file and the new line plus nil terminator
         //
         text = malloc(sizeof(*text) * (statBuf.st_size + 2));
-
+        
         if (text) {
             // set those two extra bytes to zero so that we don't forget to
             // do it later. they ensure that we end up nil-terminated.
@@ -58,11 +71,11 @@ WraitheCMS_Text *ReadFile(const char *fileName, int forceNewLine, int trimTraili
             text->length                 = (int)statBuf.st_size;
             text->text[text->length    ] = 0;
             text->text[text->length + 1] = 0;
-
+            
             // only do the file read if it has data in it
             //
             if (statBuf.st_size > 0) {
-                FILE *fp = fopen(fileName, "r");
+                FILE *fp = fopen(nameBuffer, "r");
                 if (!fp || fread(text->text, statBuf.st_size, 1, fp) != 1) {
                     // delete text on any error
                     //
@@ -90,12 +103,12 @@ WraitheCMS_Text *ReadFile(const char *fileName, int forceNewLine, int trimTraili
                     text->text[text->length - 1] = 0;
                 }
             }
-
+            
             text->isNull = (text->text[0] == 0) ? 1 : 0;
-
+            
         }
     }
-
+    
     return text;
 }
 

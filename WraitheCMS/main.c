@@ -39,11 +39,28 @@ int main(int argc, const char * argv[])
     printf("WraitheCMS is licensed under the MIT license.\n");
     printf("Please see the file LICENSE for details.\n\n");
 
+    int idx;
+
+    const char *searchPath[128];
+    for (idx = 0; idx < 128; idx++) {
+        searchPath[idx] = 0;
+    }
+
+    searchPath[0] = "/Users/mdhender/Software/WraitheCMS/data/";
+
+    WraitheCMS_SymTab *symtab = WraitheCMS_NewSymTab();
+    if (!symtab) {
+        perror("newSymTab");
+        return 2;
+    }
+    WraitheCMS_SymTab_Add(symtab, "siteName", "WraitheCMS");
+    WraitheCMS_SymTab_Add(symtab, "pageTitle", "Another Exciting Article");
+
     WraitheCMS_Source source;
-    source.source = "/Users/mdhender/Software/WraitheCMS/data/article.tpl";
+    source.source = "article.tpl";
     source.line   = 1;
     source.curr   = 0;
-    source.data   = ReadFile(source.source, 0, 0);
+    source.data   = ReadFile(searchPath, source.source, 0, 0);
     if (!source.data) {
         perror(source.source);
         return 2;
@@ -54,7 +71,7 @@ int main(int argc, const char * argv[])
     WraitheCMS_Stack_PushTop(stack, 0);
     WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText("true", -1));
 
-    if (!ViewParse(stack, &source)) {
+    if (!ViewParse(symtab, stack, searchPath, &source)) {
         printf("error:\tunable to successfully parse the view file '%s'\n", source.source);
         WraitheCMS_Stack_Dump(stack);
         return 2;

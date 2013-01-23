@@ -1,3 +1,2 @@
-/* use Property List format */
-"siteName" = "OStaticCMS";
-"copyrightYear" = "2013";
+siteName = "OStaticCMS";
+copyrightYear = "2013";

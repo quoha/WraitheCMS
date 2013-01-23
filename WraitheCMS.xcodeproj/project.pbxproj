@@ -12,6 +12,7 @@
 		2D065DE516ADD42B00B898CA /* parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D065DE416ADD42B00B898CA /* parser.c */; };
 		2D065DEA16ADE89C00B898CA /* readFile.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D065DE916ADE89C00B898CA /* readFile.c */; };
 		2D16829516AE5C46009A8773 /* symtab.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D16829416AE5C46009A8773 /* symtab.c */; };
+		2D16829716AF761F009A8773 /* parmfile.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D16829616AF761F009A8773 /* parmfile.c */; };
 		2DE9790E16A85D6800BE35BD /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DE9790D16A85D6800BE35BD /* main.c */; };
 		2DE9791016A85D6800BE35BD /* WraitheCMS.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2DE9790F16A85D6800BE35BD /* WraitheCMS.1 */; };
 /* End PBXBuildFile section */
@@ -36,6 +37,7 @@
 		2D065DE416ADD42B00B898CA /* parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = parser.c; sourceTree = "<group>"; };
 		2D065DE916ADE89C00B898CA /* readFile.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = readFile.c; sourceTree = "<group>"; };
 		2D16829416AE5C46009A8773 /* symtab.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = symtab.c; sourceTree = "<group>"; };
+		2D16829616AF761F009A8773 /* parmfile.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = parmfile.c; sourceTree = "<group>"; };
 		2DE9790916A85D6800BE35BD /* WraitheCMS */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = WraitheCMS; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE9790D16A85D6800BE35BD /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		2DE9790F16A85D6800BE35BD /* WraitheCMS.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = WraitheCMS.1; sourceTree = "<group>"; };
@@ -72,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				2DE9790D16A85D6800BE35BD /* main.c */,
+				2D16829616AF761F009A8773 /* parmfile.c */,
 				2D065DE416ADD42B00B898CA /* parser.c */,
 				2D065DE916ADE89C00B898CA /* readFile.c */,
 				2D065DE016ADCC6000B898CA /* stack.c */,
@@ -140,6 +143,7 @@
 				2D065DE516ADD42B00B898CA /* parser.c in Sources */,
 				2D065DEA16ADE89C00B898CA /* readFile.c in Sources */,
 				2D16829516AE5C46009A8773 /* symtab.c in Sources */,
+				2D16829716AF761F009A8773 /* parmfile.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

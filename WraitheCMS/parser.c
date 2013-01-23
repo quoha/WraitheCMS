@@ -155,9 +155,22 @@ Lexeme *ViewParser(WraitheCMS_SymTab *symtab, WraitheCMS_Stack *stack, const cha
                 // lookup word
                 WraitheCMS_Symbol *s = WraitheCMS_SymTab_Find(symtab, lex->data);
                 if (!s) {
-                    printf(" view:\twarn -- pushing null word '%s'\n", lex->data);
-                    WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText("", 0));
+                    if (lex->length && lex->data[lex->length - 1] != '?') {
+                        printf(" view:\twarn -- pushing null word '%s'\n", lex->data);
+                        WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText("", 0));
+                    } else {
+                        // krufty hack to test for a definition
+                        printf(" view:\twarn -- pushing word test '%s'\n", lex->data);
+                        lex->data[lex->length - 1] = 0;
+                        s = WraitheCMS_SymTab_Find(symtab, lex->data);
+                        if (s) {
+                            WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText("true", 4));
+                        } else {
+                            WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText("", 0));
+                        }
+                    }
                 } else {
+                    printf(" view:\twarn -- pushing non-null word '%s'\n", lex->data);
                     WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText(s->value, (int)strlen(s->value)));
                 }
             }

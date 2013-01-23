@@ -111,6 +111,7 @@ WraitheCMS_Symbol    *WraitheCMS_Symbol_Free(WraitheCMS_Symbol *symbol);
 WraitheCMS_Symbol    *WraitheCMS_SymTab_Add(WraitheCMS_SymTab *symtab, const char *name, const char *value);
 WraitheCMS_Symbol    *WraitheCMS_SymTab_Find(WraitheCMS_SymTab *symtab, const char *name);
 
+int                   NameValue(WraitheCMS_SymTab *symtab, char *buffer);
 WraitheCMS_Text      *ReadFile(const char **searchPath, const char *fileName, int forceNewLine, int trimTrailingNewline);
 int                   ViewParse(WraitheCMS_SymTab *symtab, WraitheCMS_Stack *stack, const char **searchPath, WraitheCMS_Source *source);
 

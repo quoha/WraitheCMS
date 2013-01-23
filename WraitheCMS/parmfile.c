@@ -30,7 +30,7 @@
 #include <string.h>
 #include <ctype.h>
 
-int NameValue(char *buffer) {
+int NameValue(WraitheCMS_SymTab *symtab, char *buffer) {
     char *s = buffer;
     while (*s) {
         char *p   = s;
@@ -84,7 +84,7 @@ int NameValue(char *buffer) {
                 }
                 if (*p != q) {
                     printf("error:\tunterminated %c in file\n", q);
-                    break;
+                    return 0;
                 }
                 
                 while (*p && *p != ';') {
@@ -121,9 +121,12 @@ int NameValue(char *buffer) {
             }
         } else {
             printf("\nerror:\tinvalid line\n");
-            break;
+            return 0;
         }
+
+        WraitheCMS_SymTab_Add(symtab, name, value);
     }
-    return 0;
+
+    return 1;
 }
 

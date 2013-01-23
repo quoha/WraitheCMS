@@ -46,15 +46,22 @@ int main(int argc, const char * argv[])
         searchPath[idx] = 0;
     }
 
-    searchPath[0] = "/Users/mdhender/Software/WraitheCMS/data/";
-
     WraitheCMS_SymTab *symtab = WraitheCMS_NewSymTab();
     if (!symtab) {
         perror("newSymTab");
         return 2;
     }
-    WraitheCMS_SymTab_Add(symtab, "siteName", "WraitheCMS");
-    WraitheCMS_SymTab_Add(symtab, "pageTitle", "Another Exciting Article");
+
+    searchPath[0] = "/Users/mdhender/Software/WraitheCMS/data/";
+
+    WraitheCMS_Text *siteFile = ReadFile(searchPath, "siteVariables", 0, 0);
+    if (!siteFile) {
+        perror("siteVariables");
+        return 2;
+    } else if (!NameValue(symtab, siteFile->text)) {
+        printf("error:\tinvalid file 'siteVariables'\n");
+        return 2;
+    }
 
     WraitheCMS_Source source;
     source.source = "article.tpl";

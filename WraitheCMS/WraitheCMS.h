@@ -105,6 +105,7 @@ WraitheCMS_Text      *WraitheCMS_NewText(const char *data_, int length);
 WraitheCMS_Text      *WraitheCMS_Stack_PopTop(WraitheCMS_Stack *stack);
 WraitheCMS_StackNode *WraitheCMS_Stack_PushTop(WraitheCMS_Stack *stack, WraitheCMS_Text *t);
 void                  WraitheCMS_Stack_Dump(WraitheCMS_Stack *stack);
+void                  WraitheCMS_Stack_Render(WraitheCMS_Stack *stack);
 
 WraitheCMS_Symbol    *WraitheCMS_Symbol_Free(WraitheCMS_Symbol *symbol);
 

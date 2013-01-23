@@ -63,6 +63,15 @@ int main(int argc, const char * argv[])
         return 2;
     }
 
+    WraitheCMS_Text *articleFile = ReadFile(searchPath, "thePowerOfStatic", 0, 0);
+    if (!articleFile) {
+        perror("thePowerOfStatic");
+        return 2;
+    } else if (!NameValue(symtab, articleFile->text)) {
+        printf("error:\tinvalid file 'thePowerOfStatic'\n");
+        return 2;
+    }
+    
     WraitheCMS_Source source;
     source.source = "article.tpl";
     source.line   = 1;
@@ -75,8 +84,6 @@ int main(int argc, const char * argv[])
     printf(">>>%s<<<\n\n", source.data->text);
 
     WraitheCMS_Stack *stack = WraitheCMS_NewStack();
-    WraitheCMS_Stack_PushTop(stack, 0);
-    WraitheCMS_Stack_PushTop(stack, WraitheCMS_NewText("true", -1));
 
     if (!ViewParse(symtab, stack, searchPath, &source)) {
         printf("error:\tunable to successfully parse the view file '%s'\n", source.source);
@@ -86,7 +93,7 @@ int main(int argc, const char * argv[])
 
     printf(" info:\tsuccessfully ran the view file %s\n", source.source);
 
-    WraitheCMS_Stack_Dump(stack);
+    WraitheCMS_Stack_Render(stack);
 
     return 0;
 }

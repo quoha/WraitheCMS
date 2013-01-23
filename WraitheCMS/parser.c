@@ -359,6 +359,9 @@ Lexeme *ViewLexer_Text(WraitheCMS_Source *source) {
             text->kind   = lxTEXT;
             memcpy(text->data, startText, stopText - startText);
 
+#if 0
+            // for testing, purge the new-lines
+            //
             char *p = text->data;
             while (*p) {
                 if (*p == '\n') {
@@ -366,6 +369,7 @@ Lexeme *ViewLexer_Text(WraitheCMS_Source *source) {
                 }
                 p++;
             }
+#endif
         }
     }
     

@@ -108,3 +108,16 @@ WraitheCMS_StackNode *WraitheCMS_Stack_PushTop(WraitheCMS_Stack *stack, WraitheC
     return n;
 }
 
+
+//----------------------------------------------------------------------
+//
+void WraitheCMS_Stack_Render(WraitheCMS_Stack *stack) {
+    WraitheCMS_StackNode *node = stack->bottom;
+    while (node) {
+        if (node->text) {
+            printf("%s", node->text->text);
+        }
+        node = node->next;
+    }
+}
+

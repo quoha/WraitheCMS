@@ -176,9 +176,13 @@ Lexeme *ViewParser(WraitheCMS_SymTab *symtab, WraitheCMS_Stack *stack, const cha
             }
             lex = lex->next;
         } else if (lex->kind == lxIF) {
-            // check the state of the token
-            int truth = ifLevel - 1;
-            
+            int truth = 0; // assume false
+
+            WraitheCMS_Text *test = WraitheCMS_Stack_PopTop(stack);
+            if (test && !test->isNull) {
+                truth = 1;
+            }
+
             printf(".word:\t%*c %-8s %6s %s\n", ifLevel*2 + 1, '.', lex->data, doExecute ? "exec" : "ignore", truth ? "true" : "false");
             Lexeme *lIf = lex;
             

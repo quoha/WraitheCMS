@@ -95,6 +95,6 @@ int main(int argc, const char * argv[])
 
     WraitheCMS_Stack_Render(stack);
 
-    return 0;
+    return 2;
 }
 

@@ -125,7 +125,7 @@ int ViewParse(WraitheCMS_SymTab *symtab, WraitheCMS_Stack *stack, const char **s
 
     Lexeme *result = ViewParser(symtab, stack, searchPath, lex, 1, 0);
     if (result && result->kind == lxEOF) {
-        return 1; 
+        return 1;
     }
 
     return 0;

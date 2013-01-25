@@ -52,6 +52,8 @@ int main(int argc, const char * argv[])
         return 2;
     }
 
+    // default for development
+    //
     searchPath[0] = "/Users/mdhender/Software/WraitheCMS/data/";
 
     WraitheCMS_Text *siteFile = ReadFile(searchPath, "siteVariables", 0, 0);

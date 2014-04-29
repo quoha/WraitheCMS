@@ -1,0 +1,8 @@
+publishDate   = "Jan 7th, 2013";
+pageTitle     = "The Power of WraithCMS";
+articleTitle  = "The Beauty of Static Web Sites";
+wordToReplace = "slugline";
+<@<@>@>
+I would like a <cms wordToReplace />. But I will settle for less.
+
+Testing, paragraph two. Good luck.
